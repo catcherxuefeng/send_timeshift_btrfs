@@ -7,11 +7,12 @@
 # 0.这个脚本只能在ubuntu及其衍生版使用
 # 1.目标文件系统必须是btrfs
 # 2.第一次备份必须手动执行 
+# 3.依赖:pv 
 #  
 # Usage: sudo bash backup_timeshift.sh
 #
 # Author: catcherxuefeng
-# Date: 2023-12-07
+# Date: 2023-12-09
 #
 
 # 定义源目标文件夹
@@ -27,9 +28,9 @@ send_snapshot(){
     btrfs property set -ts $s_dir/$2/@home ro true
     # 创建新目录
     mkdir $t_dir$2
-    # 发送快照
-    btrfs send -p $s_dir/$1/@ $s_dir/$2/@ | btrfs receive $t_dir$2
-    btrfs send -p $s_dir/$1/@home $s_dir/$2/@home | btrfs receive $t_dir$2
+    # 发送快照,显示进度
+    btrfs send -p $s_dir/$1/@ $s_dir/$2/@ | pv |btrfs receive $t_dir$2
+    btrfs send -p $s_dir/$1/@home $s_dir/$2/@home | pv |btrfs receive $t_dir$2
     echo "send snapshots $2 ok" 
 }
 # 查看目标磁盘占用
